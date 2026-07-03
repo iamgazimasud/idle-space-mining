@@ -13,7 +13,7 @@
   --bad: #ff5a6e;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 html, body {
   height: 100%;
@@ -22,6 +22,13 @@ html, body {
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   font-size: 14px;
   overflow: hidden;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation; /* no double-tap zoom while rapid-clicking the planet */
+}
+
+button, .tab-btn, .buy-row, canvas, #topbar, .res-row, .planet-card, .ach-cell {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 button { font-family: inherit; cursor: pointer; }
@@ -94,12 +101,13 @@ button { font-family: inherit; cursor: pointer; }
   flex-direction: column;
   border-right: 1px solid var(--border);
   min-height: 0;
+  min-width: 0; /* never let content force the grid track wider than the viewport */
   position: relative;
 }
-#scene-wrap { flex: 1 1 45%; min-height: 240px; position: relative; }
+#scene-wrap { flex: 1 1 45%; min-height: 240px; position: relative; overflow: hidden; }
 #scene { display: block; cursor: crosshair; }
 #scene:active { cursor: grabbing; }
-#right { display: flex; flex-direction: column; min-height: 0; }
+#right { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 
 /* ------------------------------------------------ event banner */
 .event-banner {
@@ -375,6 +383,8 @@ button { font-family: inherit; cursor: pointer; }
 .setting-row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
 .settings-btns { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
 .save-area {
+  user-select: text;
+  -webkit-user-select: text;
   width: 100%;
   height: 110px;
   background: rgba(0, 0, 0, 0.4);
@@ -527,7 +537,11 @@ button { font-family: inherit; cursor: pointer; }
 .help-guide b { color: var(--text); }
 
 @media (max-width: 900px) {
-  #tutorial-card { bottom: 12px; left: 12px; width: 260px; }
+  #tutorial-card {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 12px;
+    width: 260px;
+  }
 }
 
 /* ------------------------------------------------ tooltip */
@@ -553,9 +567,58 @@ button { font-family: inherit; cursor: pointer; }
   #app { height: auto; min-height: 100vh; }
   #layout { grid-template-columns: 1fr; }
   #left { border-right: none; border-bottom: 1px solid var(--border); }
-  #scene-wrap { min-height: 300px; height: 42vh; }
+  #scene-wrap { min-height: 260px; height: 38vh; }
   #resources-panel { max-height: 200px; }
-  #panel { padding-bottom: 80px; }
+  #panel { padding: 12px 10px calc(90px + env(safe-area-inset-bottom)); }
+
+  /* Compact sticky topbar */
+  #topbar {
+    position: sticky;
+    top: 0;
+    padding: 6px 10px;
+    padding-top: calc(6px + env(safe-area-inset-top));
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  #topbar::-webkit-scrollbar { display: none; }
+  .brand { gap: 0; }
+  .brand-name { display: none; }
+  .brand-icon { font-size: 20px; }
+  .top-stats { gap: 6px; flex-wrap: nowrap; }
+  .top-stat { padding: 4px 8px; border-radius: 8px; white-space: nowrap; }
+  .ts-val { font-size: 13px; }
+  .ts-sub { display: none; }
+  .amt-btn { padding: 5px 8px; font-size: 11px; }
+  .help-btn { padding: 4px 9px; }
+
+  /* Sticky tab bar with bigger touch targets */
+  #tabs {
+    position: sticky;
+    top: 46px;
+    z-index: 4;
+    padding: 6px 8px;
+  }
   .tab-name { display: none; }
-  .tab-btn { padding: 8px 12px; font-size: 16px; }
+  .tab-btn { padding: 10px 13px; font-size: 17px; }
+
+  /* Bigger touch targets */
+  .btn { padding: 10px 14px; }
+  .btn-buy { min-width: 92px; }
+  .buy-row { padding: 10px 12px; }
+
+  /* Toasts on top so they never cover the tutorial card or buy buttons */
+  #toasts {
+    top: calc(env(safe-area-inset-top) + 56px);
+    bottom: auto;
+    right: 8px;
+    left: 8px;
+    max-width: none;
+    align-items: flex-end;
+  }
+  .toast { max-width: 320px; }
+
+  .modal { padding: 18px; max-height: 85vh; }
+  .settings-btns .btn { flex: 1 1 40%; }
 }

@@ -20,14 +20,20 @@ const Render = {
     this.ctx = canvas.getContext('2d');
     this.resize();
     window.addEventListener('resize', () => this.resize());
+    if (window.ResizeObserver) {
+      new ResizeObserver(() => this.resize()).observe(canvas.parentElement);
+    }
     this.setPlanet(S.currentPlanet);
   },
 
   resize() {
     const rect = this.canvas.parentElement.getBoundingClientRect();
+    const w = Math.min(rect.width, window.innerWidth);
+    const h = Math.max(260, rect.height);
+    if (Math.abs(w - this.w) < 1 && Math.abs(h - this.h) < 1) return; // no real change
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.w = rect.width;
-    this.h = Math.max(260, rect.height);
+    this.w = w;
+    this.h = h;
     this.canvas.width = this.w * this.dpr;
     this.canvas.height = this.h * this.dpr;
     this.canvas.style.width = this.w + 'px';

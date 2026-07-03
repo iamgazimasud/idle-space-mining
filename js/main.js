@@ -15,6 +15,7 @@
 
   // ---- Planet clicking
   const canvas = document.getElementById('scene');
+  canvas.addEventListener('contextmenu', e => e.preventDefault()); // no long-press menu on mobile
   canvas.addEventListener('pointerdown', e => {
     Sound.unlock();
     const rect = canvas.getBoundingClientRect();
